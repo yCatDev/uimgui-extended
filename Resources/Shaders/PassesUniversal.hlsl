@@ -10,6 +10,7 @@
 
 TEXTURE2D(_Texture);
 SAMPLER(sampler_Texture);
+float4x4 _ImGuiModel;
 
 half4 unpack_color(uint c)
 {
@@ -28,7 +29,9 @@ half4 unpack_color(uint c)
 Varyings ImGuiPassVertex(ImVert input)
 {
     Varyings output  = (Varyings)0;
-    output.vertex    = TransformWorldToHClip(TransformObjectToWorld(float3(input.vertex, 0.0)));
+    float4 world = mul(_ImGuiModel, float4(input.vertex.xy, 0, 1));
+    float4 clip  = mul(UNITY_MATRIX_VP, world);
+    output.vertex    = clip;
     output.uv        = float2(input.uv.x, 1 - input.uv.y);
     output.color     = unpack_color(input.color);
     return output;

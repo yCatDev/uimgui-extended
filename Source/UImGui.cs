@@ -3,6 +3,7 @@ using UImGui.Assets;
 using UImGui.Events;
 using UImGui.Platform;
 using UImGui.Renderer;
+using UImGui.Texture;
 using UnityEngine;
 using UnityEngine.Rendering;
 

@@ -19,7 +19,9 @@
                 "unity" : "2020.1"
             }
             Name "DEARIMGUI URP"
-
+            
+            //AlphaToMask On
+            
             HLSLPROGRAM
             #pragma vertex ImGuiPassVertex
             #pragma fragment ImGuiPassFrag

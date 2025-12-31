@@ -21,15 +21,18 @@ namespace UImGui.Texture
 		private readonly Dictionary<Sprite, SpriteInfo> _spriteData = new Dictionary<Sprite, SpriteInfo>();
 
 		private readonly HashSet<IntPtr> _allocatedGlyphRangeArrays = new HashSet<IntPtr>();
+		public UTexture AtalsTexture => _atlasTexture;
 
 		public unsafe void Initialize(ImGuiIOPtr io)
 		{
 			ImFontAtlasPtr atlasPtr = io.Fonts;
 			atlasPtr.GetTexDataAsRGBA32(out byte* pixels, out int width, out int height, out int bytesPerPixel);
 
-			_atlasTexture = new Texture2D(width, height, TextureFormat.RGBA32, false, false)
+			_atlasTexture = new Texture2D(width, height, TextureFormat.RGBA32, true, true)
 			{
-				filterMode = FilterMode.Point
+				name = "IMGUI Atlas Texture",
+				filterMode = FilterMode.Bilinear,
+				anisoLevel = 8,
 			};
 
 			// TODO: Remove collections and make native array manually.
@@ -45,7 +48,7 @@ namespace UImGui.Texture
 				NativeArray<byte>.Copy(srcData, y * stride, dstData, (height - y - 1) * stride, stride);
 			}
 
-			_atlasTexture.Apply();
+			_atlasTexture.Apply(true);
 		}
 
 		public void Shutdown()
@@ -102,7 +105,7 @@ namespace UImGui.Texture
 			return id;
 		}
 
-		public void BuildFontAtlas(ImGuiIOPtr io, in FontAtlasConfigAsset settings, FontInitializerEvent custom)
+		public unsafe void BuildFontAtlas(ImGuiIOPtr io, in FontAtlasConfigAsset settings, FontInitializerEvent custom)
 		{
 			if (io.Fonts.IsBuilt())
 			{
@@ -125,6 +128,7 @@ namespace UImGui.Texture
 					io.Fonts.AddFontDefault();
 				}
 
+				io.NativePtr->FontDefault = io.Fonts.Fonts[0];
 				io.Fonts.Build();
 				return;
 			}

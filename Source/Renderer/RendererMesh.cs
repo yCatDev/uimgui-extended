@@ -14,214 +14,257 @@ using Object = UnityEngine.Object;
 
 namespace UImGui.Renderer
 {
-	internal sealed class RendererMesh : IRenderer
-	{
-		// Skip all checks and validation when updating the mesh.
-		private const MeshUpdateFlags NoMeshChecks = MeshUpdateFlags.DontNotifyMeshUsers |
-			MeshUpdateFlags.DontRecalculateBounds |
-			MeshUpdateFlags.DontResetBoneBounds |
-			MeshUpdateFlags.DontValidateIndices;
+    internal sealed class RendererMesh : IRenderer
+    {
+        // Skip all checks and validation when updating the mesh.
+        private const MeshUpdateFlags NoMeshChecks = MeshUpdateFlags.DontNotifyMeshUsers |
+                                                     MeshUpdateFlags.DontRecalculateBounds |
+                                                     MeshUpdateFlags.DontResetBoneBounds |
+                                                     MeshUpdateFlags.DontValidateIndices;
 
-		// Color sent with TexCoord1 semantics because otherwise Color attribute would be reordered to come before UVs.
-		private static readonly VertexAttributeDescriptor[] _vertexAttributes = new[]
-		{
-			new VertexAttributeDescriptor(VertexAttribute.Position , VertexAttributeFormat.Float32, 2), // Position.
-			new VertexAttributeDescriptor(VertexAttribute.TexCoord0, VertexAttributeFormat.Float32, 2), // UV.
-			new VertexAttributeDescriptor(VertexAttribute.TexCoord1, VertexAttributeFormat.UInt32 , 1), // Color.
+        // Color sent with TexCoord1 semantics because otherwise Color attribute would be reordered to come before UVs.
+        private static readonly VertexAttributeDescriptor[] _vertexAttributes = new[]
+        {
+            new VertexAttributeDescriptor(VertexAttribute.Position, VertexAttributeFormat.Float32, 2), // Position.
+            new VertexAttributeDescriptor(VertexAttribute.TexCoord0, VertexAttributeFormat.Float32, 2), // UV.
+            new VertexAttributeDescriptor(VertexAttribute.TexCoord1, VertexAttributeFormat.UInt32, 1), // Color.
         };
 
-		private Material _material;
-		private Mesh _mesh;
+        private Material _material;
+        private Mesh _mesh;
 
-		private readonly Shader _shader;
-		private readonly int _textureID;
-		private readonly TextureManager _textureManager;
-		private readonly MaterialPropertyBlock _materialProperties;
+        private readonly Shader _shader;
+        private readonly int _textureID;
+        private readonly TextureManager _textureManager;
+        private readonly MaterialPropertyBlock _materialProperties;
 
-		private int _prevSubMeshCount = 1;  // number of sub meshes used previously
+        private int _prevSubMeshCount = 1; // number of sub meshes used previously
 
-		public RendererMesh(ShaderResourcesAsset resources, TextureManager texManager)
-		{
-			_shader = resources.Shader.Mesh;
-			_textureManager = texManager;
-			_textureID = Shader.PropertyToID(resources.PropertyNames.Texture);
-			_materialProperties = new MaterialPropertyBlock();
-		}
+        public RendererMesh(ShaderResourcesAsset resources, TextureManager texManager)
+        {
+            _shader = resources.Shader.Mesh;
+            _textureManager = texManager;
+            _textureID = Shader.PropertyToID(resources.PropertyNames.Texture);
+            _materialProperties = new MaterialPropertyBlock();
+        }
 
-		public void Initialize(ImGuiIOPtr io)
-		{
-			io.SetBackendRendererName("Unity Mesh");
-			// Supports ImDrawCmd::VtxOffset to output large meshes while still using 16-bits indices.
-			io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;
+        public void Initialize(ImGuiIOPtr io)
+        {
+            io.SetBackendRendererName("Unity Mesh");
+            // Supports ImDrawCmd::VtxOffset to output large meshes while still using 16-bits indices.
+            io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;
 
-			_material = new Material(_shader)
-			{
-				hideFlags = HideFlags.HideAndDontSave & ~HideFlags.DontUnloadUnusedAsset
-			};
+            _material = new Material(_shader)
+            {
+                hideFlags = HideFlags.HideAndDontSave & ~HideFlags.DontUnloadUnusedAsset
+            };
 
-			_mesh = new Mesh
-			{
-				name = "DearImGui Mesh"
-			};
-			_mesh.MarkDynamic();
-		}
+            _mesh = new Mesh
+            {
+                name = "DearImGui Mesh"
+            };
+            _mesh.MarkDynamic();
+        }
 
-		public void Shutdown(ImGuiIOPtr io)
-		{
-			io.SetBackendRendererName(null);
+        public void Shutdown(ImGuiIOPtr io)
+        {
+            io.SetBackendRendererName(null);
 
-			if (_mesh != null)
-			{
-				Object.Destroy(_mesh);
-				_mesh = null;
-			}
+            if (_mesh != null)
+            {
+                Object.Destroy(_mesh);
+                _mesh = null;
+            }
 
-			if (_material != null)
-			{
-				Object.Destroy(_material);
-				_material = null;
-			}
-		}
+            if (_material != null)
+            {
+                Object.Destroy(_material);
+                _material = null;
+            }
+        }
 
-		public void RenderDrawLists(CommandBuffer commandBuffer, ImDrawDataPtr drawData)
-		{
-			Vector2 fbOSize = drawData.DisplaySize * drawData.FramebufferScale;
+        public void RenderDrawLists(CommandBuffer commandBuffer, ImDrawDataPtr drawData)
+        {
+            Vector2 fbOSize = drawData.DisplaySize * drawData.FramebufferScale;
 
-			// Avoid rendering when minimized.
-			if (fbOSize.x <= 0f || fbOSize.y <= 0f || drawData.TotalVtxCount == 0) return;
+            // Avoid rendering when minimized.
+            if (fbOSize.x <= 0f || fbOSize.y <= 0f || drawData.TotalVtxCount == 0) return;
 
-			Constants.UpdateMeshMarker.Begin();
-			UpdateMesh(drawData);
-			Constants.UpdateMeshMarker.End();
+            Constants.UpdateMeshMarker.Begin();
+            UpdateMesh(drawData);
+            Constants.UpdateMeshMarker.End();
 
-			commandBuffer.BeginSample(Constants.ExecuteDrawCommandsMarker);
-			Constants.CreateDrawCommandsMarker.Begin();
+            commandBuffer.BeginSample(Constants.ExecuteDrawCommandsMarker);
+            Constants.CreateDrawCommandsMarker.Begin();
 
-			CreateDrawCommands(commandBuffer, drawData, fbOSize);
+            CreateDrawCommands(commandBuffer, drawData, fbOSize);
 
-			Constants.CreateDrawCommandsMarker.End();
-			commandBuffer.EndSample(Constants.ExecuteDrawCommandsMarker);
-		}
+            Constants.CreateDrawCommandsMarker.End();
+            commandBuffer.EndSample(Constants.ExecuteDrawCommandsMarker);
+        }
 
-		private void UpdateMesh(ImDrawDataPtr drawData)
-		{
-			// Number of submeshes is the same as the nr of ImDrawCmd.
-			int subMeshCount = 0;
-			for (int n = 0, nMax = drawData.CmdListsCount; n < nMax; ++n)
-			{
-				subMeshCount += drawData.CmdLists[n].CmdBuffer.Size;
-			}
+        private void UpdateMesh(ImDrawDataPtr drawData)
+        {
+            // Number of submeshes is the same as the nr of ImDrawCmd.
+            int subMeshCount = 0;
+            for (int n = 0, nMax = drawData.CmdListsCount; n < nMax; ++n)
+            {
+                subMeshCount += drawData.CmdLists[n].CmdBuffer.Size;
+            }
 
-			if (_prevSubMeshCount != subMeshCount)
-			{
-				// Occasionally crashes when changing subMeshCount without clearing first.
-				_mesh.Clear(true);
-				_mesh.subMeshCount = _prevSubMeshCount = subMeshCount;
-			}
-			_mesh.SetVertexBufferParams(drawData.TotalVtxCount, _vertexAttributes);
-			_mesh.SetIndexBufferParams(drawData.TotalIdxCount, IndexFormat.UInt16);
+            if (_prevSubMeshCount != subMeshCount)
+            {
+                // Occasionally crashes when changing subMeshCount without clearing first.
+                _mesh.Clear(true);
+                _mesh.subMeshCount = _prevSubMeshCount = subMeshCount;
+            }
 
-			//  Upload data into mesh.
-			int vtxOf = 0;
-			int idxOf = 0;
-			List<SubMeshDescriptor> descriptors = new List<SubMeshDescriptor>();
+            _mesh.SetVertexBufferParams(drawData.TotalVtxCount, _vertexAttributes);
+            _mesh.SetIndexBufferParams(drawData.TotalIdxCount, IndexFormat.UInt16);
 
-			for (int n = 0, nMax = drawData.CmdListsCount; n < nMax; ++n)
-			{
-				ImDrawListPtr drawList = drawData.CmdLists[n];
+            //  Upload data into mesh.
+            int vtxOf = 0;
+            int idxOf = 0;
+            List<SubMeshDescriptor> descriptors = new List<SubMeshDescriptor>();
 
-				unsafe
-				{
-					// TODO: Convert NativeArray to C# array or list (remove collections).
-					NativeArray<ImDrawVert> vtxArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<ImDrawVert>(
-						(void*)drawList.VtxBuffer.Data, drawList.VtxBuffer.Size, Allocator.None);
-					NativeArray<ushort> idxArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<ushort>(
-						(void*)drawList.IdxBuffer.Data, drawList.IdxBuffer.Size, Allocator.None);
+            for (int n = 0, nMax = drawData.CmdListsCount; n < nMax; ++n)
+            {
+                ImDrawListPtr drawList = drawData.CmdLists[n];
+
+                unsafe
+                {
+                    // TODO: Convert NativeArray to C# array or list (remove collections).
+                    NativeArray<ImDrawVert> vtxArray =
+                        NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<ImDrawVert>(
+                            (void*)drawList.VtxBuffer.Data, drawList.VtxBuffer.Size, Allocator.None);
+                    NativeArray<ushort> idxArray = NativeArrayUnsafeUtility.ConvertExistingDataToNativeArray<ushort>(
+                        (void*)drawList.IdxBuffer.Data, drawList.IdxBuffer.Size, Allocator.None);
 
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-					NativeArrayUnsafeUtility
-						.SetAtomicSafetyHandle(ref vtxArray, AtomicSafetyHandle.GetTempMemoryHandle());
-					NativeArrayUnsafeUtility
-						.SetAtomicSafetyHandle(ref idxArray, AtomicSafetyHandle.GetTempMemoryHandle());
+                    NativeArrayUnsafeUtility
+                        .SetAtomicSafetyHandle(ref vtxArray, AtomicSafetyHandle.GetTempMemoryHandle());
+                    NativeArrayUnsafeUtility
+                        .SetAtomicSafetyHandle(ref idxArray, AtomicSafetyHandle.GetTempMemoryHandle());
 #endif
-					// Upload vertex/index data.
-					_mesh.SetVertexBufferData(vtxArray, 0, vtxOf, vtxArray.Length, 0, NoMeshChecks);
-					_mesh.SetIndexBufferData(idxArray, 0, idxOf, idxArray.Length, NoMeshChecks);
+                    // Upload vertex/index data.
+                    _mesh.SetVertexBufferData(vtxArray, 0, vtxOf, vtxArray.Length, 0, NoMeshChecks);
+                    _mesh.SetIndexBufferData(idxArray, 0, idxOf, idxArray.Length, NoMeshChecks);
 
-					// Define subMeshes.
-					for (int i = 0, iMax = drawList.CmdBuffer.Size; i < iMax; ++i)
-					{
-						ImDrawCmdPtr cmd = drawList.CmdBuffer[i];
-						SubMeshDescriptor descriptor = new SubMeshDescriptor
-						{
-							topology = MeshTopology.Triangles,
-							indexStart = idxOf + (int)cmd.IdxOffset,
-							indexCount = (int)cmd.ElemCount,
-							baseVertex = vtxOf + (int)cmd.VtxOffset,
-						};
-						descriptors.Add(descriptor);
-					}
+                    // Define subMeshes.
+                    for (int i = 0, iMax = drawList.CmdBuffer.Size; i < iMax; ++i)
+                    {
+                        ImDrawCmdPtr cmd = drawList.CmdBuffer[i];
+                        SubMeshDescriptor descriptor = new SubMeshDescriptor
+                        {
+                            topology = MeshTopology.Triangles,
+                            indexStart = idxOf + (int)cmd.IdxOffset,
+                            indexCount = (int)cmd.ElemCount,
+                            baseVertex = vtxOf + (int)cmd.VtxOffset,
+                        };
+                        descriptors.Add(descriptor);
+                    }
 
-					vtxOf += vtxArray.Length;
-					idxOf += idxArray.Length;
-				}
-			}
+                    vtxOf += vtxArray.Length;
+                    idxOf += idxArray.Length;
+                }
+            }
 
-			_mesh.SetSubMeshes(descriptors, NoMeshChecks);
-			_mesh.UploadMeshData(false);
-		}
+            _mesh.SetSubMeshes(descriptors, NoMeshChecks);
+            _mesh.UploadMeshData(false);
+        }
 
-		private void CreateDrawCommands(CommandBuffer commandBuffer, ImDrawDataPtr drawData, Vector2 fbSize)
-		{
-			IntPtr prevTextureId = IntPtr.Zero;
-			Vector4 clipOffset = new Vector4(drawData.DisplayPos.x, drawData.DisplayPos.y,
-				drawData.DisplayPos.x, drawData.DisplayPos.y);
-			Vector4 clipScale = new Vector4(drawData.FramebufferScale.x, drawData.FramebufferScale.y,
-				drawData.FramebufferScale.x, drawData.FramebufferScale.y);
+        private float ComputePixelsPerMeter(float distanceMeters, float targetPixelsPerDegree = 60f)
+        {
+            float degreesPerMeter = Mathf.Rad2Deg * 2f * Mathf.Atan(0.5f / distanceMeters);
 
-			commandBuffer.SetViewport(new Rect(0f, 0f, fbSize.x, fbSize.y));
-			commandBuffer.SetViewProjectionMatrices(
-				Matrix4x4.Translate(new Vector3(0.5f / fbSize.x, 0.5f / fbSize.y, 0f)), // Small adjustment to improve text.
-				Matrix4x4.Ortho(0f, fbSize.x, fbSize.y, 0f, 0f, 1f));
+            return targetPixelsPerDegree * degreesPerMeter;
+        }
 
-			int subOf = 0;
-			for (int n = 0, nMax = drawData.CmdListsCount; n < nMax; ++n)
-			{
-				ImDrawListPtr drawList = drawData.CmdLists[n];
-				for (int i = 0, iMax = drawList.CmdBuffer.Size; i < iMax; ++i, ++subOf)
-				{
-					ImDrawCmdPtr drawCmd = drawList.CmdBuffer[i];
-					if (drawCmd.UserCallback != IntPtr.Zero)
-					{
-						UserDrawCallback userDrawCallback = Marshal.GetDelegateForFunctionPointer<UserDrawCallback>(drawCmd.UserCallback);
-						userDrawCallback(drawList, drawCmd);
-					}
-					else
-					{
-						// Project scissor rectangle into framebuffer space and skip if fully outside.
-						Vector4 clipSize = drawCmd.ClipRect - clipOffset;
-						Vector4 clip = Vector4.Scale(clipSize, clipScale);
+        private void CreateDrawCommands(CommandBuffer commandBuffer, ImDrawDataPtr drawData, Vector2 fbSize)
+        {
+            IntPtr prevTextureId = IntPtr.Zero;
+            Vector4 clipOffset = new Vector4(drawData.DisplayPos.x, drawData.DisplayPos.y,
+                drawData.DisplayPos.x, drawData.DisplayPos.y);
+            Vector4 clipScale = new Vector4(drawData.FramebufferScale.x, drawData.FramebufferScale.y,
+                drawData.FramebufferScale.x, drawData.FramebufferScale.y);
 
-						if (clip.x >= fbSize.x || clip.y >= fbSize.y || clip.z < 0f || clip.w < 0f) continue;
+            float uiDistance = 1.2f;
+            float ppm = ComputePixelsPerMeter(uiDistance, 30f); //Test
+            float metersPerPixel = 1f / ppm;
 
-						if (prevTextureId != drawCmd.TextureId)
-						{
-							prevTextureId = drawCmd.TextureId;
+            float uiWidthM = fbSize.x * metersPerPixel;
+            float uiHeightM = fbSize.y * metersPerPixel;
 
-							// TODO: Implement ImDrawCmdPtr.GetTexID().
-							bool hasTexture = _textureManager.TryGetTexture(prevTextureId, out UnityEngine.Texture texture);
-							Assert.IsTrue(hasTexture, $"Texture {prevTextureId} does not exist. Try to use UImGuiUtility.GetTextureID().");
+            var cam = Camera.main; // Very temporary solution
+            Vector3 uiCenter = cam.transform.position + cam.transform.forward * uiDistance;
+            Quaternion uiRot = cam.transform.rotation;
 
-							_materialProperties.SetTexture(_textureID, texture);
-						}
+            Vector3 right = uiRot * Vector3.right;
+            Vector3 up = uiRot * Vector3.up;
 
-						commandBuffer.EnableScissorRect(new Rect(clip.x, fbSize.y - clip.w, clip.z - clip.x, clip.w - clip.y)); // Invert y.
-						commandBuffer.DrawMesh(_mesh, Matrix4x4.identity, _material, subOf, -1, _materialProperties);
-					}
-				}
-			}
-			commandBuffer.DisableScissorRect();
-		}
-	}
+            Vector3 uiOriginTopLeft =
+                uiCenter
+                - right * (uiWidthM * 0.5f)
+                + up * (uiHeightM * 0.5f);
+
+            Matrix4x4 model =
+                Matrix4x4.TRS(uiOriginTopLeft, uiRot, Vector3.one) *
+                Matrix4x4.Scale(new Vector3(metersPerPixel, -metersPerPixel, 1f));
+
+            Matrix4x4 view = cam.worldToCameraMatrix;
+            Matrix4x4 proj = cam.projectionMatrix;
+
+
+            Matrix4x4 textTweak = Matrix4x4.Translate(new Vector3(0.5f, 0.5f, 0f));
+            model = model * textTweak;
+
+            commandBuffer.SetViewProjectionMatrices(view, proj);
+
+
+            commandBuffer.SetGlobalMatrix("_ImGuiModel", model);
+
+            int subOf = 0;
+            for (int n = 0, nMax = drawData.CmdListsCount; n < nMax; ++n)
+            {
+                ImDrawListPtr drawList = drawData.CmdLists[n];
+                for (int i = 0, iMax = drawList.CmdBuffer.Size; i < iMax; ++i, ++subOf)
+                {
+                    ImDrawCmdPtr drawCmd = drawList.CmdBuffer[i];
+                    if (drawCmd.UserCallback != IntPtr.Zero)
+                    {
+                        UserDrawCallback userDrawCallback =
+                            Marshal.GetDelegateForFunctionPointer<UserDrawCallback>(drawCmd.UserCallback);
+                        userDrawCallback(drawList, drawCmd);
+                    }
+                    else
+                    {
+                        // Project scissor rectangle into framebuffer space and skip if fully outside.
+                        Vector4 clipSize = drawCmd.ClipRect - clipOffset;
+                        Vector4 clip = Vector4.Scale(clipSize, clipScale);
+
+                        if (clip.x >= fbSize.x || clip.y >= fbSize.y || clip.z < 0f || clip.w < 0f) continue;
+
+                        if (prevTextureId != drawCmd.TextureId)
+                        {
+                            prevTextureId = drawCmd.TextureId;
+
+                            // TODO: Implement ImDrawCmdPtr.GetTexID().
+                            bool hasTexture =
+                                _textureManager.TryGetTexture(prevTextureId, out UnityEngine.Texture texture);
+                            Assert.IsTrue(hasTexture,
+                                $"Texture {prevTextureId} does not exist. Try to use UImGuiUtility.GetTextureID().");
+
+                            _materialProperties.SetTexture(_textureID, texture);
+                        }
+
+                        //commandBuffer.EnableScissorRect(new Rect(clip.x, fbSize.y - clip.w, clip.z - clip.x, clip.w - clip.y)); // Invert y.
+                        commandBuffer.DrawMesh(_mesh, Matrix4x4.identity, _material, subOf, -1, _materialProperties);
+                    }
+                }
+            }
+
+            commandBuffer.DisableScissorRect();
+        }
+    }
 }
 #endif
