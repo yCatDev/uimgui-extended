@@ -1,4 +1,5 @@
 ﻿using UImGui.Assets;
+using UImGui.Platform;
 using UImGui.Renderer;
 using UImGui.Texture;
 using UnityEngine.Assertions;
@@ -13,7 +14,7 @@ namespace UImGui
 {
 	internal static class RenderUtility
 	{
-		public static IRenderer Create(RenderType type, ShaderResourcesAsset shaders, TextureManager textures)
+		public static IRenderer Create(RenderType type, ShaderResourcesAsset shaders, TextureManager textures, WorldSpaceTransformerConfig worldSpaceTransformerConfig = null)
 		{
 			Assert.IsNotNull(shaders, "Shaders not assigned.");
 
@@ -25,6 +26,10 @@ namespace UImGui
 #endif
 				case RenderType.Procedural:
 					return new RendererProcedural(shaders, textures);
+				
+				case RenderType.VRMesh:
+					return new RendererVRMesh(shaders, textures, worldSpaceTransformerConfig);
+				
 				default:
 					return null;
 			}

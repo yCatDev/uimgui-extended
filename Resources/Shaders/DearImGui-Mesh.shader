@@ -19,10 +19,11 @@
                 "unity" : "2020.1"
             }
             Name "DEARIMGUI URP"
-            
-            //AlphaToMask On
-            
+                       
             HLSLPROGRAM
+
+            #pragma multi_compile_instancing
+            
             #pragma vertex ImGuiPassVertex
             #pragma fragment ImGuiPassFrag
             #include "./PassesUniversal.hlsl"

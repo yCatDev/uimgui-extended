@@ -23,6 +23,7 @@ namespace UImGui.Editor
         private SerializedProperty _shaders;
         private SerializedProperty _style;
         private SerializedProperty _cursorShapes;
+        private SerializedProperty _worldSpaceTransformerConfig;
         private readonly StringBuilder _messages = new StringBuilder();
 
         private bool usingImNodes = true;
@@ -47,6 +48,7 @@ namespace UImGui.Editor
             EditorGUILayout.PropertyField(_camera);
             EditorGUILayout.PropertyField(_renderer);
             EditorGUILayout.PropertyField(_platform);
+            DrawVRRelatedThings();
             EditorGUILayout.PropertyField(_initialConfiguration);
             EditorGUILayout.PropertyField(_fontAtlasConfiguration);
             EditorGUILayout.PropertyField(_fontCustomInitializer);
@@ -70,6 +72,21 @@ namespace UImGui.Editor
             }
 
             DrawDebug();
+        }
+
+        private void DrawVRRelatedThings()
+        {
+            if (_renderer.intValue == (int)RenderType.VRMesh)
+            {
+                EditorGUI.indentLevel++;
+                EditorGUILayout.PropertyField(_worldSpaceTransformerConfig);
+                EditorGUI.indentLevel--;
+                
+                if (_platform.intValue != (int)InputType.VRInput)
+                {
+                    EditorGUILayout.HelpBox("VR Mesh renderer requires VR Input System platform.", MessageType.Error);
+                }
+            }
         }
 
         private void DrawDebug()
@@ -101,7 +118,7 @@ namespace UImGui.Editor
             _shaders = serializedObject.FindProperty("_shaders");
             _style = serializedObject.FindProperty("_style");
             _cursorShapes = serializedObject.FindProperty("_cursorShapes");
-            _cursorShapes = serializedObject.FindProperty("_cursorShapes");
+            _worldSpaceTransformerConfig = serializedObject.FindProperty("_worldSpaceTransformerConfig");
 
 #if UIMGUI_REMOVE_IMNODES
             usingImNodes = false;

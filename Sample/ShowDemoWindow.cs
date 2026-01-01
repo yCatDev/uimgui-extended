@@ -74,6 +74,12 @@ namespace UImGui
 				ImGui.End();
 			}
 #endif
+			if (ImGui.Begin("Test window 2"))
+			{
+				ImGui.SetNextWindowPos(Vector2.zero);
+				ImGui.SetNextWindowSize(new Vector2(800, 400));
+			}
+			
 
 			ImGui.ShowDemoWindow();
 		}

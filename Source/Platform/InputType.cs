@@ -4,5 +4,6 @@
 	{
 		InputManager = 0,
 		InputSystem = 1,
+		VRInput = 2
 	}
 }

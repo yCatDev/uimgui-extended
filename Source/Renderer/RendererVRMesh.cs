@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UImGui.Assets;
+using UImGui.Platform;
 using UImGui.Texture;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -15,7 +16,7 @@ using Object = UnityEngine.Object;
 
 namespace UImGui.Renderer
 {
-    internal sealed class RendererMesh : IRenderer
+    internal sealed class RendererVRMesh : IRenderer
     {
         // Skip all checks and validation when updating the mesh.
         private const MeshUpdateFlags NoMeshChecks = MeshUpdateFlags.DontNotifyMeshUsers |
@@ -38,24 +39,19 @@ namespace UImGui.Renderer
         private readonly int _textureID;
         private readonly TextureManager _textureManager;
         private readonly MaterialPropertyBlock _materialProperties;
+        private readonly WorldSpaceTransformer _worldSpaceTransformer;
 
         private int _prevSubMeshCount = 1; // number of sub meshes used previously
-        private readonly Vector3 _initialCameraPosition;
-        private readonly Quaternion _initialCameraRotation;
-        private Matrix4x4 _localToWorld;
-        private bool _matrixCalculated;
+        
 
-        public RendererMesh(ShaderResourcesAsset resources, TextureManager texManager)
+        public RendererVRMesh(ShaderResourcesAsset resources, TextureManager texManager, WorldSpaceTransformerConfig worldSpaceTransformerConfig)
         {
             _shader = resources.Shader.Mesh;
             _textureManager = texManager;
             _textureID = Shader.PropertyToID(resources.PropertyNames.Texture);
             _materialProperties = new MaterialPropertyBlock();
-            _initialCameraPosition= Camera.main.transform.position 
-                                    + Camera.main.transform.forward * 1200
-                                    - Camera.main.transform.right * (Screen.width * 0.5f * 1)
-                                    + Camera.main.transform.up * (Screen.height * 0.5f * 1);
-            _initialCameraRotation = Camera.main.transform.rotation;
+
+            _worldSpaceTransformer = new WorldSpaceTransformer(worldSpaceTransformerConfig);
         }
 
         public void Initialize(ImGuiIOPtr io)
@@ -100,6 +96,8 @@ namespace UImGui.Renderer
             // Avoid rendering when minimized.
             if (fbOSize.x <= 0f || fbOSize.y <= 0f || drawData.TotalVtxCount == 0) return;
 
+            _worldSpaceTransformer.Update();
+            
             Constants.UpdateMeshMarker.Begin();
             UpdateMesh(drawData);
             Constants.UpdateMeshMarker.End();
@@ -183,43 +181,6 @@ namespace UImGui.Renderer
             _mesh.UploadMeshData(false);
         }
 
-        private float ComputePixelsPerMeter(float distanceMeters, float targetPixelsPerDegree = 60f)
-        {
-            float degreesPerMeter = Mathf.Rad2Deg * 2f * Mathf.Atan(0.5f / distanceMeters);
-
-            return targetPixelsPerDegree * degreesPerMeter;
-        }
-        
-        static Vector2 GetPerEyeFbSize()
-        {
-            int w = XRSettings.eyeTextureWidth;
-            int h = XRSettings.eyeTextureHeight;
-
-            return new Vector2Int(w, h);
-        }
-        
-        static Vector3 ExtractPositionFromWorldMatrix(Matrix4x4 m) => m.GetColumn(3);
-
-        static void GetHeadPoseFromStereo(Camera cam, out Vector3 headPos, out Quaternion headRot)
-        {
-            // view matrices: world -> eye
-            var vL = cam.GetStereoViewMatrix(Camera.StereoscopicEye.Left);
-            var vR = cam.GetStereoViewMatrix(Camera.StereoscopicEye.Right);
-
-            // invert: eye -> world
-            var wL = vL.inverse;
-            var wR = vR.inverse;
-
-            var pL = ExtractPositionFromWorldMatrix(wL);
-            var pR = ExtractPositionFromWorldMatrix(wR);
-
-            headPos = 0.5f * (pL + pR);
-
-            // Для ориентации обычно достаточно rotation камеры (она “головная”).
-            // Но если у тебя камера реально “глазная”, то можно взять rot из wL/wR и усреднить.
-            headRot = cam.transform.rotation;
-        }
-
         private void CreateDrawCommands(CommandBuffer commandBuffer, ImDrawDataPtr drawData, Vector2 fbSize)
         {
             IntPtr prevTextureId = IntPtr.Zero;
@@ -227,37 +188,7 @@ namespace UImGui.Renderer
                 drawData.DisplayPos.x, drawData.DisplayPos.y);
             Vector4 clipScale = new Vector4(drawData.FramebufferScale.x, drawData.FramebufferScale.y,
                 drawData.FramebufferScale.x, drawData.FramebufferScale.y);
-
-            if (!_matrixCalculated)
-            {
-                var camera = Camera.main;
-                float w = drawData.DisplaySize.x;
-                float h = drawData.DisplaySize.y;
-                float fov = camera.fieldOfView; // или 90f
-                float minDistance = h / (2f * Mathf.Tan(Mathf.Deg2Rad * fov / 2f));
-
-
-                float pixelsPerUnit = 1000f; 
-                float scale = 1f / pixelsPerUnit;
-                
-                Vector3 virtualCameraPos = new Vector3(0, 1.5f, 0); 
-                Quaternion virtualCameraRot = Quaternion.identity;
-                
-                float distance = 1.5f;
-                
-                Vector3 panelCenter = virtualCameraPos
-                                      + virtualCameraRot * Vector3.forward * distance;
-                
-                Vector3 offset = virtualCameraRot * new Vector3(-w * 0.5f * scale, h * 0.5f * scale, 0);
-
-                _localToWorld = Matrix4x4.TRS(
-                    panelCenter + offset,
-                    virtualCameraRot,
-                    new Vector3(scale, -scale, scale)
-                );
-
-                _matrixCalculated = true;
-            }
+            
 
             int subOf = 0;
             
@@ -295,7 +226,7 @@ namespace UImGui.Renderer
                         }
 
                         //commandBuffer.EnableScissorRect(new Rect(clip.x, fbSize.y - clip.w, clip.z - clip.x, clip.w - clip.y)); // Invert y.
-                        commandBuffer.DrawMesh(_mesh, _localToWorld, _material, subOf, -1, _materialProperties);
+                        commandBuffer.DrawMesh(_mesh, _worldSpaceTransformer.LocalToWorldMatrix, _material, subOf, -1, _materialProperties);
                     }
                 }
             }

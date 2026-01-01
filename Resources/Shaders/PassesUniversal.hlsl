@@ -29,9 +29,12 @@ half4 unpack_color(uint c)
 Varyings ImGuiPassVertex(ImVert input)
 {
     Varyings output  = (Varyings)0;
-    float4 world = mul(_ImGuiModel, float4(input.vertex.xy, 0, 1));
-    float4 clip  = mul(UNITY_MATRIX_VP, world);
-    output.vertex    = clip;
+
+    UNITY_SETUP_INSTANCE_ID(input);
+    UNITY_TRANSFER_INSTANCE_ID(input, output);
+    UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
+    
+    output.vertex    = TransformWorldToHClip(TransformObjectToWorld(float3(input.vertex, 0.0)));
     output.uv        = float2(input.uv.x, 1 - input.uv.y);
     output.color     = unpack_color(input.color);
     return output;
@@ -39,6 +42,9 @@ Varyings ImGuiPassVertex(ImVert input)
 
 half4 ImGuiPassFrag(Varyings input) : SV_Target
 {
+    UNITY_SETUP_INSTANCE_ID(input);
+    UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+    
     return input.color * SAMPLE_TEXTURE2D(_Texture, sampler_Texture, input.uv);
 }
 

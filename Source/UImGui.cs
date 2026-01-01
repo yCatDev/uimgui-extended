@@ -29,6 +29,8 @@ namespace UImGui
 		[SerializeField]
 		private InputType _platformType = InputType.InputManager;
 
+		[SerializeField] private WorldSpaceTransformerConfig _worldSpaceTransformerConfig;
+
 		[Tooltip("Null value uses default imgui.ini file.")]
 		[SerializeField]
 		private IniSettingsAsset _iniSettings = null;
@@ -178,7 +180,7 @@ namespace UImGui
 				Fail(nameof(_platform));
 			}
 
-			SetRenderer(RenderUtility.Create(_rendererType, _shaders, _context.TextureManager), io);
+			SetRenderer(RenderUtility.Create(_rendererType, _shaders, _context.TextureManager, _worldSpaceTransformerConfig), io);
 			if (_renderer == null)
 			{
 				Fail(nameof(_renderer));
@@ -250,7 +252,10 @@ namespace UImGui
 
 			Constants.PrepareFrameMarker.Begin(this);
 			_context.TextureManager.PrepareFrame(io);
-			_platform.PrepareFrame(io, _camera.pixelRect);
+			var rect = _camera.pixelRect;
+			//rect.width *= io.DisplayFramebufferScale.x;
+			//rect.height *= io.DisplayFramebufferScale.y;
+			_platform.PrepareFrame(io, rect);
 			ImGui.NewFrame();
 #if !UIMGUI_REMOVE_IMGUIZMO
 			ImGuizmoNET.ImGuizmo.BeginFrame();

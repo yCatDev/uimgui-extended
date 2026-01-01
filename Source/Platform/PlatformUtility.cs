@@ -16,6 +16,9 @@ namespace UImGui.Platform
 				case InputType.InputSystem:
 					return true;
 #endif
+				case InputType.VRInput:
+					return true;
+				
 				default:
 					return false;
 			}
@@ -32,6 +35,9 @@ namespace UImGui.Platform
 				case InputType.InputSystem:
 					return new InputSystemPlatform(cursors, iniSettings);
 #endif
+				case InputType.VRInput:
+					return new VRPlatform(cursors, iniSettings);
+				
 				default:
 					Debug.LogError($"[DearImGui] {type} platform not available.");
 					return null;

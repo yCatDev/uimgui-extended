@@ -1,4 +1,3 @@
-#if HAS_INPUTSYSTEM
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -9,18 +8,10 @@ using UnityEngine.InputSystem.Controls;
 
 namespace UImGui.Platform
 {
-    // Implemented features:
-    // [x] Platform: Clipboard support.
-    // [x] Platform: Mouse cursor shape and visibility. Disable with io.ConfigFlags |= ImGuiConfigFlags.NoMouseCursorChange.
-    // [x] Platform: Keyboard arrays indexed using InputSystem.Key codes, e.g. ImGui.IsKeyPressed(Key.Space).
-    // [x] Platform: Gamepad support. Enabled with io.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad.
-    // [~] Platform: IME support.
-    // [~] Platform: INI settings support.
-
     /// <summary>
-    /// Platform bindings for ImGui in Unity in charge of: mouse/keyboard/gamepad inputs, cursor shape, timing, windowing.
+    /// Platform bindings for ImGui in Unity for VR based on Input System`s setup 
     /// </summary>
-    internal sealed class InputSystemPlatform : PlatformBase
+    internal sealed class VRPlatform : PlatformBase
     {
         private readonly List<char> _textInput = new();
 
@@ -28,7 +19,7 @@ namespace UImGui.Platform
 
         private Keyboard _keyboard;
 
-        public InputSystemPlatform(CursorShapesAsset cursorShapes, IniSettingsAsset iniSettings)
+        public VRPlatform(CursorShapesAsset cursorShapes, IniSettingsAsset iniSettings)
             : base(cursorShapes, iniSettings)
         {
         }
@@ -273,4 +264,3 @@ namespace UImGui.Platform
         #endregion
     }
 }
-#endif
