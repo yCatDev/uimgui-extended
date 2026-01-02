@@ -1,11 +1,12 @@
 ﻿using System;
 using UnityEngine;
 
-namespace UImGui.Platform
+namespace UImGui.VR
 {
     [Serializable]
     public class WorldSpaceTransformerConfig
     {
+        public Transform trackingSpace;
         public Camera camera;
         
         public float initialDistanceFromCamera = 1.5f;
@@ -14,5 +15,6 @@ namespace UImGui.Platform
         public float followingSpeed = 7f;
         public float lookAngleThresholdToFollow = 25f;
         public float distanceThresholdToFollow = 0.5f;
+        public float pixelsPerUnit = 1000f;
     }
 }

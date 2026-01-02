@@ -2,6 +2,7 @@ using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using UImGui.Assets;
+using UImGui.VR;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
@@ -24,70 +25,38 @@ namespace UImGui.Platform
         {
         }
 
-        private static void UpdateMouse(ImGuiIOPtr io, Mouse mouse)
+        private static void UpdateMouse(ImGuiIOPtr io, VirtualXRInput virtualXRInput,
+            WorldSpaceTransformer worldSpaceTransformer)
         {
-            if (mouse == null)
-            {
-                return;
-            }
+            var mouseScreenPosition = worldSpaceTransformer.GetCursorPosition(
+                virtualXRInput.CursorPosition.ReadValue<Vector3>(),
+                virtualXRInput.CursorRotation.ReadValue<Quaternion>());
+            io.MousePos = Utils.ScreenToImGui(mouseScreenPosition);
 
-            // Set Unity mouse position if requested.
-            if (io.WantSetMousePos)
-            {
-                mouse.WarpCursorPosition(Utils.ImGuiToScreen(io.MousePos));
-            }
-
-            io.MousePos = Utils.ScreenToImGui(mouse.position.ReadValue());
-
-            var mouseScroll = mouse.scroll.ReadValue() / 120f;
+            var mouseScroll = virtualXRInput.Scroll.ReadValue<Vector2>();
             io.MouseWheel = mouseScroll.y;
             io.MouseWheelH = mouseScroll.x;
 
-            io.MouseDown[0] = mouse.leftButton.isPressed;
-            io.MouseDown[1] = mouse.rightButton.isPressed;
-            io.MouseDown[2] = mouse.middleButton.isPressed;
+            io.MouseDown[0] = virtualXRInput.PressButton.IsPressed();
+            io.MouseDown[1] = virtualXRInput.SecondaryPressButton.IsPressed();
+            io.MouseDown[2] = false; // TODO: Middle scroll button, maybe we need this...
         }
 
-        private static void UpdateGamepad(ImGuiIOPtr io, Gamepad gamepad)
+        private static void UpdateXRControllers(ImGuiIOPtr io, VirtualXRInput virtualXRInput)
         {
-            io.BackendFlags = gamepad == null ? io.BackendFlags & ~ImGuiBackendFlags.HasGamepad : io.BackendFlags | ImGuiBackendFlags.HasGamepad;
+            io.BackendFlags |= ImGuiBackendFlags.HasGamepad;
+            io.ConfigFlags |= ImGuiConfigFlags.NavEnableGamepad;
 
-            if (gamepad == null || (io.ConfigFlags & ImGuiConfigFlags.NavEnableGamepad) == 0)
-            {
-                return;
-            }
+            io.AddKeyAnalogEvent(ImGuiKey.GamepadFaceDown, virtualXRInput.PrimaryButton.IsPressed(),
+                virtualXRInput.PrimaryButton.ReadValue<float>()); 
+            io.AddKeyAnalogEvent(ImGuiKey.GamepadFaceRight, virtualXRInput.SecondaryButton.IsPressed(),
+                virtualXRInput.SecondaryButton.ReadValue<float>());
 
-            // TODO: Confirm it's working. NOT TESTED
-
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadStart, gamepad.aButton.IsPressed(), gamepad.aButton.ReadValue()); // A / Cross
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadBack, gamepad.bButton.IsPressed(), gamepad.bButton.ReadValue()); // A / Cross
-
-            io.AddKeyEvent(ImGuiKey.GamepadFaceDown, gamepad.buttonSouth.IsPressed()); // A / Cross
-            io.AddKeyEvent(ImGuiKey.GamepadFaceRight, gamepad.buttonEast.IsPressed()); // B / Circle
-            io.AddKeyEvent(ImGuiKey.GamepadFaceLeft, gamepad.buttonWest.IsPressed()); // X / Square
-            io.AddKeyEvent(ImGuiKey.GamepadFaceUp, gamepad.buttonNorth.IsPressed()); // Y / Triangle
-
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadDpadDown, gamepad.dpad.down.IsPressed(), gamepad.dpad.down.ReadValue());
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadDpadRight, gamepad.dpad.right.IsPressed(), gamepad.dpad.right.ReadValue());
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadDpadLeft, gamepad.dpad.left.IsPressed(), gamepad.dpad.left.ReadValue());
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadDpadUp, gamepad.dpad.up.IsPressed(), gamepad.dpad.up.ReadValue());
-
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadL1, gamepad.leftShoulder.IsPressed(), gamepad.leftShoulder.ReadValue()); // LB / L1
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadL2, gamepad.leftTrigger.IsPressed(), gamepad.leftTrigger.ReadValue()); // LB / L2
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadR1, gamepad.rightShoulder.IsPressed(), gamepad.rightShoulder.ReadValue()); // RB / R1
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadR2, gamepad.rightTrigger.IsPressed(), gamepad.rightTrigger.ReadValue()); // RB / R2
-
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadLStickDown, gamepad.leftStick.down.IsPressed(), gamepad.leftStick.down.ReadValue());
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadLStickLeft, gamepad.leftStick.left.IsPressed(), gamepad.leftStick.left.ReadValue());
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadLStickRight, gamepad.leftStick.right.IsPressed(), gamepad.leftStick.right.ReadValue());
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadLStickUp, gamepad.leftStick.up.IsPressed(), gamepad.leftStick.up.ReadValue());
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadL3, gamepad.leftStickButton.IsPressed(), gamepad.leftStickButton.ReadValue());
-
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadRStickDown, gamepad.rightStick.down.IsPressed(), gamepad.rightStick.down.ReadValue());
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadRStickLeft, gamepad.rightStick.left.IsPressed(), gamepad.rightStick.left.ReadValue());
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadRStickRight, gamepad.rightStick.right.IsPressed(), gamepad.rightStick.right.ReadValue());
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadRStickUp, gamepad.rightStick.up.IsPressed(), gamepad.rightStick.up.ReadValue());
-            io.AddKeyAnalogEvent(ImGuiKey.GamepadR3, gamepad.rightStickButton.IsPressed(), gamepad.rightStickButton.ReadValue());
+            var thumbstickVector = virtualXRInput.Thumbstick.ReadValue<Vector2>();
+            io.AddKeyAnalogEvent(ImGuiKey.GamepadDpadUp, thumbstickVector.y > 0.5f, thumbstickVector.y);
+            io.AddKeyAnalogEvent(ImGuiKey.GamepadDpadDown, thumbstickVector.y < -0.5f, -thumbstickVector.y);
+            io.AddKeyAnalogEvent(ImGuiKey.GamepadDpadLeft, thumbstickVector.x < -0.5f, -thumbstickVector.x);
+            io.AddKeyAnalogEvent(ImGuiKey.GamepadDpadRight, thumbstickVector.x > 0.5f, thumbstickVector.x);
         }
 
         private void SetupKeyboard(Keyboard keyboard)
@@ -230,7 +199,8 @@ namespace UImGui.Platform
 
             unsafe
             {
-                PlatformCallbacks.SetClipboardFunctions(PlatformCallbacks.GetClipboardTextCallback, PlatformCallbacks.SetClipboardTextCallback);
+                PlatformCallbacks.SetClipboardFunctions(PlatformCallbacks.GetClipboardTextCallback,
+                    PlatformCallbacks.SetClipboardTextCallback);
             }
 
             SetupKeyboard(Keyboard.current);
@@ -248,17 +218,10 @@ namespace UImGui.Platform
         {
             base.PrepareFrame(io, displayRect);
 
-            try
-            {
-                UpdateKeyboard(io, Keyboard.current);
-                UpdateMouse(io, Mouse.current);
-                UpdateCursor(io, ImGui.GetMouseCursor());
-                UpdateGamepad(io, Gamepad.current);
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
+            //UpdateKeyboard(io, Keyboard.current);
+            UpdateMouse(io, UImGuiUtility.VRContext.VirtualXRInput, UImGuiUtility.VRContext.WorldSpaceTransformer);
+            UpdateCursor(io, ImGui.GetMouseCursor());
+            UpdateXRControllers(io, UImGuiUtility.VRContext.VirtualXRInput);
         }
 
         #endregion

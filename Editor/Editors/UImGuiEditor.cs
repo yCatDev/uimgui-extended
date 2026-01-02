@@ -23,7 +23,7 @@ namespace UImGui.Editor
         private SerializedProperty _shaders;
         private SerializedProperty _style;
         private SerializedProperty _cursorShapes;
-        private SerializedProperty _worldSpaceTransformerConfig;
+        private SerializedProperty _vrConfiguration;
         private readonly StringBuilder _messages = new StringBuilder();
 
         private bool usingImNodes = true;
@@ -79,7 +79,7 @@ namespace UImGui.Editor
             if (_renderer.intValue == (int)RenderType.VRMesh)
             {
                 EditorGUI.indentLevel++;
-                EditorGUILayout.PropertyField(_worldSpaceTransformerConfig);
+                EditorGUILayout.PropertyField(_vrConfiguration);
                 EditorGUI.indentLevel--;
                 
                 if (_platform.intValue != (int)InputType.VRInput)
@@ -118,7 +118,7 @@ namespace UImGui.Editor
             _shaders = serializedObject.FindProperty("_shaders");
             _style = serializedObject.FindProperty("_style");
             _cursorShapes = serializedObject.FindProperty("_cursorShapes");
-            _worldSpaceTransformerConfig = serializedObject.FindProperty("_worldSpaceTransformerConfig");
+            _vrConfiguration = serializedObject.FindProperty("_vrConfiguration");
 
 #if UIMGUI_REMOVE_IMNODES
             usingImNodes = false;

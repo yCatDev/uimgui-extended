@@ -4,6 +4,7 @@ using UImGui.Events;
 using UImGui.Platform;
 using UImGui.Renderer;
 using UImGui.Texture;
+using UImGui.VR;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -29,7 +30,7 @@ namespace UImGui
 		[SerializeField]
 		private InputType _platformType = InputType.InputManager;
 
-		[SerializeField] private WorldSpaceTransformerConfig _worldSpaceTransformerConfig;
+		[SerializeField] private VRConfiguration _vrConfiguration;
 
 		[Tooltip("Null value uses default imgui.ini file.")]
 		[SerializeField]
@@ -86,6 +87,7 @@ namespace UImGui
 		private bool _doGlobalEvents = true; // Do global/default Layout event too.
 
 		private bool _isChangingCamera = false;
+		private VRContext _vrContext;
 
 		public CommandBuffer CommandBuffer => _renderCommandBuffer;
 
@@ -129,6 +131,7 @@ namespace UImGui
 		private void Awake()
 		{
 			_context = UImGuiUtility.CreateContext();
+			_vrContext = UImGuiUtility.CreateVRContext(_vrConfiguration);
 		}
 
 		private void OnEnable()
@@ -163,7 +166,7 @@ namespace UImGui
 				_camera.AddCommandBuffer(CameraEvent.AfterEverything, _renderCommandBuffer);
 			}
 
-			UImGuiUtility.SetCurrentContext(_context);
+			UImGuiUtility.SetCurrentContext(_context, _vrContext);
 
 			ImGuiIOPtr io = ImGui.GetIO();
 
@@ -180,7 +183,7 @@ namespace UImGui
 				Fail(nameof(_platform));
 			}
 
-			SetRenderer(RenderUtility.Create(_rendererType, _shaders, _context.TextureManager, _worldSpaceTransformerConfig), io);
+			SetRenderer(RenderUtility.Create(_rendererType, _shaders, _context.TextureManager), io);
 			if (_renderer == null)
 			{
 				Fail(nameof(_renderer));
@@ -195,13 +198,13 @@ namespace UImGui
 
 		private void OnDisable()
 		{
-			UImGuiUtility.SetCurrentContext(_context);
+			UImGuiUtility.SetCurrentContext(_context, _vrContext);
 			ImGuiIOPtr io = ImGui.GetIO();
 
 			SetRenderer(null, io);
 			SetPlatform(null, io);
 
-			UImGuiUtility.SetCurrentContext(null);
+			UImGuiUtility.SetCurrentContext(null, null);
 
 			_context.TextureManager.Shutdown();
 			_context.TextureManager.DestroyFontAtlas(io);
@@ -247,7 +250,7 @@ namespace UImGui
 
 		internal void DoUpdate(CommandBuffer buffer)
 		{
-			UImGuiUtility.SetCurrentContext(_context);
+			UImGuiUtility.SetCurrentContext(_context, _vrContext);
 			ImGuiIOPtr io = ImGui.GetIO();
 
 			Constants.PrepareFrameMarker.Begin(this);

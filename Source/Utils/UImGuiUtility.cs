@@ -1,6 +1,7 @@
 ﻿using ImGuiNET;
 using System;
 using UImGui.Texture;
+using UImGui.VR;
 using UnityEngine;
 using UTexture = UnityEngine.Texture;
 
@@ -12,6 +13,7 @@ namespace UImGui
 		internal static SpriteInfo GetSpriteInfo(Sprite sprite) => Context?.TextureManager.GetSpriteInfo(sprite) ?? null;
 
 		internal static Context Context;
+		internal static VRContext VRContext;
 
 		#region Events
 		public static event Action<UImGui> Layout;
@@ -36,6 +38,15 @@ namespace UImGui
 				TextureManager = new TextureManager()
 			};
 		}
+		
+		internal static VRContext CreateVRContext(VRConfiguration configuration)
+		{
+			return new VRContext
+			{
+				VirtualXRInput = new VirtualXRInput(configuration.vrInputAsset, configuration.handCursorMode),
+				WorldSpaceTransformer = new WorldSpaceTransformer(configuration.worldSpaceConfig)
+			};
+		}
 
 		internal static void DestroyContext(Context context)
 		{
@@ -49,7 +60,7 @@ namespace UImGui
 #endif
 		}
 
-		internal static void SetCurrentContext(Context context)
+		internal static void SetCurrentContext(Context context, VRContext vrContext)
 		{
 			Context = context;
 			ImGui.SetCurrentContext(context?.ImGuiContext ?? IntPtr.Zero);
@@ -63,6 +74,8 @@ namespace UImGui
 #if !UIMGUI_REMOVE_IMNODES
 			imnodesNET.imnodes.SetImGuiContext(context?.ImGuiContext ?? IntPtr.Zero);
 #endif
+
+			VRContext = vrContext;
 		}
 	}
 }

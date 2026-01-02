@@ -39,19 +39,16 @@ namespace UImGui.Renderer
         private readonly int _textureID;
         private readonly TextureManager _textureManager;
         private readonly MaterialPropertyBlock _materialProperties;
-        private readonly WorldSpaceTransformer _worldSpaceTransformer;
 
         private int _prevSubMeshCount = 1; // number of sub meshes used previously
         
 
-        public RendererVRMesh(ShaderResourcesAsset resources, TextureManager texManager, WorldSpaceTransformerConfig worldSpaceTransformerConfig)
+        public RendererVRMesh(ShaderResourcesAsset resources, TextureManager texManager)
         {
             _shader = resources.Shader.Mesh;
             _textureManager = texManager;
             _textureID = Shader.PropertyToID(resources.PropertyNames.Texture);
             _materialProperties = new MaterialPropertyBlock();
-
-            _worldSpaceTransformer = new WorldSpaceTransformer(worldSpaceTransformerConfig);
         }
 
         public void Initialize(ImGuiIOPtr io)
@@ -96,7 +93,7 @@ namespace UImGui.Renderer
             // Avoid rendering when minimized.
             if (fbOSize.x <= 0f || fbOSize.y <= 0f || drawData.TotalVtxCount == 0) return;
 
-            _worldSpaceTransformer.Update();
+            UImGuiUtility.VRContext.WorldSpaceTransformer.Update();
             
             Constants.UpdateMeshMarker.Begin();
             UpdateMesh(drawData);
@@ -226,7 +223,7 @@ namespace UImGui.Renderer
                         }
 
                         //commandBuffer.EnableScissorRect(new Rect(clip.x, fbSize.y - clip.w, clip.z - clip.x, clip.w - clip.y)); // Invert y.
-                        commandBuffer.DrawMesh(_mesh, _worldSpaceTransformer.LocalToWorldMatrix, _material, subOf, -1, _materialProperties);
+                        commandBuffer.DrawMesh(_mesh, UImGuiUtility.VRContext.WorldSpaceTransformer.LocalToWorldMatrix, _material, subOf, -1, _materialProperties);
                     }
                 }
             }

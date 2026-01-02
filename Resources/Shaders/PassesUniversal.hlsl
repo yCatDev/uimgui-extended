@@ -10,7 +10,6 @@
 
 TEXTURE2D(_Texture);
 SAMPLER(sampler_Texture);
-float4x4 _ImGuiModel;
 
 half4 unpack_color(uint c)
 {
@@ -44,7 +43,8 @@ half4 ImGuiPassFrag(Varyings input) : SV_Target
 {
     UNITY_SETUP_INSTANCE_ID(input);
     UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
-    
+
+    //TODO: Add rect clipping inside shader 
     return input.color * SAMPLE_TEXTURE2D(_Texture, sampler_Texture, input.uv);
 }
 

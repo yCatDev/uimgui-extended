@@ -14,7 +14,7 @@ namespace UImGui
 {
 	internal static class RenderUtility
 	{
-		public static IRenderer Create(RenderType type, ShaderResourcesAsset shaders, TextureManager textures, WorldSpaceTransformerConfig worldSpaceTransformerConfig = null)
+		public static IRenderer Create(RenderType type, ShaderResourcesAsset shaders, TextureManager textures)
 		{
 			Assert.IsNotNull(shaders, "Shaders not assigned.");
 
@@ -28,7 +28,7 @@ namespace UImGui
 					return new RendererProcedural(shaders, textures);
 				
 				case RenderType.VRMesh:
-					return new RendererVRMesh(shaders, textures, worldSpaceTransformerConfig);
+					return new RendererVRMesh(shaders, textures);
 				
 				default:
 					return null;
