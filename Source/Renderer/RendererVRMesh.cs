@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using UImGui.Assets;
 using UImGui.Platform;
 using UImGui.Texture;
+using UImGui.VR;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
@@ -206,6 +207,7 @@ namespace UImGui.Renderer
             int subOf = 0;
 
             //commandBuffer.ClearRenderTarget(true, false, Color.clear);
+            var tintSphere = UImGuiUtility.VRContext.VRManipulator.TintSphere;
             commands.Add(new DrawCommand()
             {
                 type = DrawCommandType.ClearDepth
@@ -213,8 +215,8 @@ namespace UImGui.Renderer
             commands.Add(new DrawCommand()
             {
                 type = DrawCommandType.DrawRenderer,
-                renderer = UImGuiUtility.VRContext.VRManipulator.TintSphere,
-                materialData = UImGuiUtility.VRContext.VRManipulator.TintSphere.sharedMaterial
+                renderer = tintSphere,
+                materialData = tintSphere.sharedMaterial
             });
             //commandBuffer.DrawRenderer(UImGuiUtility.VRContext.VRManipulator.TintSphere, UImGuiUtility.VRContext.VRManipulator.TintSphere.sharedMaterial);
 

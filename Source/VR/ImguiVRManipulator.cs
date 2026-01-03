@@ -32,6 +32,8 @@ namespace UImGui.VR
             var virtualXRInput = UImGuiUtility.VRContext.VirtualXRInput;
             var worldSpaceTransformer = UImGuiUtility.VRContext.WorldSpaceTransformer;
 
+            tintSphere.transform.position = worldSpaceTransformer.Camera.transform.position;
+
             worldSpaceTransformer.GetControllerTransforms(
                 virtualXRInput.LeftControllerPosition.ReadValue<Vector3>(),
                 virtualXRInput.LeftControllerRotation.ReadValue<Quaternion>(),
