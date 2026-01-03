@@ -1,6 +1,6 @@
 # UImGui Extended
 
-![vr-mode-demo](.Documentation\vrmode.avif)
+![vr-mode-demo](.Documentation/vrmode.avif)
 
 This is a fork of the UImGui project by [psydack](https://github.com/psydack/uimgui) with several improvements I've made for my own needs and which I may continue to develop in the future.
 
