@@ -11,6 +11,7 @@ namespace UImGui.Editor
     internal class UImGuiEditor : UnityEditor.Editor
     {
         private SerializedProperty _doGlobalEvents;
+        private SerializedProperty _camera;
         private SerializedProperty _renderer;
         private SerializedProperty _platform;
         private SerializedProperty _initialConfiguration;
@@ -37,7 +38,7 @@ namespace UImGui.Editor
 
             
             EditorGUILayout.PropertyField(_doGlobalEvents);
-            
+            EditorGUILayout.PropertyField(_camera);
             EditorGUILayout.PropertyField(_renderer);
             EditorGUILayout.PropertyField(_platform);
             DrawVRRelatedThings();
@@ -98,6 +99,7 @@ namespace UImGui.Editor
         private void OnEnable()
         {
             _doGlobalEvents = serializedObject.FindProperty("_doGlobalEvents");
+            _camera = serializedObject.FindProperty("_camera");
             _renderer = serializedObject.FindProperty("_rendererType");
             _platform = serializedObject.FindProperty("_platformType");
             _initialConfiguration = serializedObject.FindProperty("_initialConfiguration");
@@ -135,6 +137,11 @@ namespace UImGui.Editor
 
             _messages.Clear();
 
+            if (_camera.objectReferenceValue == null)
+            {
+                _messages.AppendLine("Must assign a Camera.");
+            }
+            
 #if !UNITY_2020_1_OR_NEWER
 			if ((RenderType)_renderer.enumValueIndex == RenderType.Mesh)
 			{

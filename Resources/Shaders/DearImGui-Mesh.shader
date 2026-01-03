@@ -23,7 +23,7 @@
             HLSLPROGRAM
 
             #pragma multi_compile_instancing
-            #pragma shader_feature CLIP_RECT
+            #pragma multi_compile _ CLIP_RECT
             
             #pragma vertex ImGuiPassVertex
             #pragma fragment ImGuiPassFrag

@@ -18,6 +18,8 @@ namespace UImGui
 		private Context _context;
 		private IRenderer _renderer;
 		private IPlatform _platform;
+
+		[SerializeField] private Camera _camera;
 		
 		[SerializeField]
 		private RenderType _rendererType = RenderType.Mesh;
@@ -180,7 +182,7 @@ namespace UImGui
 
 			Constants.PrepareFrameMarker.Begin(this);
 			_context.TextureManager.PrepareFrame(io);
-			var rect = new Rect(0, 0, Screen.width, Screen.height);
+			var rect = _camera.pixelRect;
 			//rect.width *= io.DisplayFramebufferScale.x;
 			//rect.height *= io.DisplayFramebufferScale.y;
 			_platform.PrepareFrame(io, rect);
