@@ -1,8 +1,8 @@
 {
-  "name": "com.psydack.uimgui",
-  "displayName": "UImGui",
-  "version": "5.0.0",
-  "description": "A Unity wrapper for ImGui",
+  "name": "com.ycatdev.uimgui.extended",
+  "displayName": "UImGui Extended",
+  "version": "6.0.0",
+  "description": "Extended Unity wrapper for ImGUI.NET",
   "unity": "2019.4",
   "dependencies": {
   },
@@ -12,12 +12,12 @@
     "ui"
   ],
   "author": {
-    "name": "Psydack",
-    "url": "https://github.com/psydack"
+    "name": "yCatDev",
+    "url": "https://github.com/ycatdev"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/psydack/uimgui",
+    "url": "https://github.com/yCatDev/uimgui-extended",
     "revision": ""
   }
 }

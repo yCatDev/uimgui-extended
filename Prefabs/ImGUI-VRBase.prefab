@@ -416,172 +416,108 @@ LineRenderer:
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 0
---- !u!1001 &1347809472052219180
-PrefabInstance:
+--- !u!1 &6387026401364124075
+GameObject:
   m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 1024104415388363069, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 1.22
-      objectReference: {fileID: 0}
-    - target: {fileID: 1024104415388363069, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1024104415388363069, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: -0.15
-      objectReference: {fileID: 0}
-    - target: {fileID: 1024104415388363069, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1024104415388363069, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1024104415388363069, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1024104415388363069, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1024104415388363069, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1024104415388363069, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1024104415388363069, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _platformType
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _rendererType
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _renderFeature
-      value: 
-      objectReference: {fileID: 6394158795805951952, guid: 53a413327819a984d8ab1618c9e90a10, type: 2}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _urpRenderGraphBypass
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _vrConfiguration.vrInputAsset
-      value: 
-      objectReference: {fileID: -944628639613478452, guid: 6a97f4b82ee2f074cade0e736c57d012, type: 3}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _vrConfiguration.vrManipulator
-      value: 
-      objectReference: {fileID: 3528815397811830809}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _initialConfiguration.ImGuiConfig
-      value: 3145826
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _initialConfiguration.FontGlobalScale
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _initialConfiguration.MoveFromTitleOnly
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _vrConfiguration.worldSpaceConfig.followingSpeed
-      value: 1.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _vrConfiguration.worldSpaceConfig.cursorSmoothTime
-      value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _fontCustomInitializer.m_PersistentCalls.m_Calls.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _vrConfiguration.worldSpaceConfig.distanceThresholdToFollow
-      value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _vrConfiguration.worldSpaceConfig.lookAngleThresholdToFollow
-      value: 45
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _fontCustomInitializer.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _fontCustomInitializer.m_PersistentCalls.m_Calls.Array.data[0].m_Target
-      value: 
-      objectReference: {fileID: 4044962925488274664}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _fontCustomInitializer.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _fontCustomInitializer.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: OnFontInit
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _fontCustomInitializer.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
-      value: CustomFontBootstrap, UImGui
-      objectReference: {fileID: 0}
-    - target: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: _fontCustomInitializer.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
-      value: UnityEngine.Object, UnityEngine
-      objectReference: {fileID: 0}
-    - target: {fileID: 5338779034653158535, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      propertyPath: m_Name
-      value: VRSampleDemoWindow Variant
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 1024104415388363069, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1553479639924505218}
-    - targetCorrespondingSourceObject: {fileID: 1024104415388363069, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 8496489980872241451}
-    - targetCorrespondingSourceObject: {fileID: 1024104415388363069, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3275056525907392947}
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
---- !u!4 &2054266059299857425 stripped
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2054266059299857425}
+  - component: {fileID: 6145293369747193552}
+  m_Layer: 0
+  m_Name: ImGUI-VRBase
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2054266059299857425
 Transform:
-  m_CorrespondingSourceObject: {fileID: 1024104415388363069, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-  m_PrefabInstance: {fileID: 1347809472052219180}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6145293369747193552 stripped
+  m_GameObject: {fileID: 6387026401364124075}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.22, y: 0, z: -0.15}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1553479639924505218}
+  - {fileID: 8496489980872241451}
+  - {fileID: 3275056525907392947}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6145293369747193552
 MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5187045405267620860, guid: 672fdba9d96ef094e9d1deff4fbef58f, type: 3}
-  m_PrefabInstance: {fileID: 1347809472052219180}
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 6387026401364124075}
   m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f3823c58ff231244a92c4f9877f7911e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _camera: {fileID: 0}
+  _rendererType: 2
+  _platformType: 2
+  _vrConfiguration:
+    vrInputAsset: {fileID: -944628639613478452, guid: 6a97f4b82ee2f074cade0e736c57d012, type: 3}
+    handCursorMode: 1
+    vrManipulator: {fileID: 3528815397811830809}
+    worldSpaceConfig:
+      trackingSpace: {fileID: 0}
+      camera: {fileID: 0}
+      cursorSmoothTime: 0.1
+      minDistanceFromCamera: 1
+      maxDistanceFromCamera: 3.5
+      followingSpeed: 1.25
+      lookAngleThresholdToFollow: 45
+      pixelsPerUnit: 1000
+  _iniSettings: {fileID: 0}
+  _initialConfiguration:
+    ImGuiConfig: 3145826
+    DoubleClickTime: 0.3
+    DoubleClickMaxDist: 6
+    DragThreshold: 6
+    KeyRepeatDelay: 0.25
+    KeyRepeatRate: 0.05
+    FontGlobalScale: 0.5
+    FontAllowUserScaling: 0
+    DisplayFramebufferScale: {x: 1, y: 1}
+    MouseDrawCursor: 0
+    TextCursorBlink: 0
+    ResizeFromEdges: 1
+    MoveFromTitleOnly: 0
+    ConfigMemoryCompactTimer: 60
+    ConfigDockingNoSplit: 0
+    ConfigDockingAlwaysTabBar: 0
+    ConfigDockingTransparentPayload: 0
+  _fontCustomInitializer:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 4044962925488274664}
+        m_TargetAssemblyTypeName: CustomFontBootstrap, UImGui
+        m_MethodName: OnFontInit
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  _fontAtlasConfiguration: {fileID: 0}
+  _shaders: {fileID: 11400000, guid: 68f2e550e81076948ba9757c73f74336, type: 2}
+  _style: {fileID: 11400000, guid: 90718c4e7d6fa04438adef1ad7a432cc, type: 2}
+  _cursorShapes: {fileID: 11400000, guid: 71deade41763c6e4eaeb5df973b321f1, type: 2}
+  _doGlobalEvents: 1
 --- !u!1001 &2715598554508509234
 PrefabInstance:
   m_ObjectHideFlags: 0
