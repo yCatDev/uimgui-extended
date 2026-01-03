@@ -185,9 +185,9 @@ namespace UImGui
 			//rect.height *= io.DisplayFramebufferScale.y;
 			_platform.PrepareFrame(io, rect);
 			ImGui.NewFrame();
-#if !UIMGUI_REMOVE_IMGUIZMO
+/*#if !UIMGUI_REMOVE_IMGUIZMO
 			ImGuizmoNET.ImGuizmo.BeginFrame();
-#endif
+#endif*/
 			Constants.PrepareFrameMarker.End();
 
 			Constants.LayoutMarker.Begin(this);
