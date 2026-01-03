@@ -6,6 +6,11 @@ namespace UImGui.VR
     [Serializable]
     public class WorldSpaceTransformerConfig
     {
+        public ControllerInputMode controllerInputMode = ControllerInputMode.CalculateFromInputSystem;
+        
+        public Transform rightControllerMirrorTransform;
+        public Transform leftControllerMirrorTransform;
+        
         public Transform trackingSpace;
         public Camera camera;
         

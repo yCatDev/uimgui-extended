@@ -486,6 +486,9 @@ MonoBehaviour:
     handCursorMode: 1
     vrManipulator: {fileID: 3528815397811830809}
     worldSpaceConfig:
+      controllerInputMode: 0
+      rightControllerMirrorTransform: {fileID: 0}
+      leftControllerMirrorTransform: {fileID: 0}
       trackingSpace: {fileID: 0}
       camera: {fileID: 0}
       cursorSmoothTime: 0.1

@@ -58,9 +58,9 @@ This project is based on the [RG.ImGui](https://github.com/realgamessoftware/dea
 
 ## VR Mode Input Bindings
 
-To enter\exit VR mode, hold down the Thumbstick on either controller for 3 seconds. This can be changed in the `SimpleImGUIActivator` script located in the `ImGUI-VRBase` prefab on the `Activator` object.
+To enter/exit VR mode, hold down the Thumbstick on either controller for 2 seconds. This can be changed in the `SimpleImGUIActivator` script located in the `ImGUI-VRBase` prefab on the `Activator` object.
 
-In the UImGui script, if you set `Render Type` to `VR Mesh` and `Platform Type` to `VR Input`, a new VR mode settings block will appear. Here you can specify which controller acts as the cursor using the `Hand Cursor Mode` parameter. 
+In the UImGui script, if you set `Render Type` to `VR Mesh` and `Platform Type` to `VR Input`, a new VR mode settings block will appear. Here you can specify which controller acts as the cursor using the `Hand Cursor Mode` parameter.
 
 Currently, VR mode is designed so that the controllers share two roles between them: Cursor and Navigator. The cursor is the controller specified in `Hand Cursor Mode`, which emulates the mouse:
 
@@ -75,9 +75,13 @@ The second controller acts as the navigator and emulates a gamepad:
 * Primary button - A / Cross button on a real gamepad
 * Secondary button - B / Circle button on a real gamepad
 
-When using ImGUI-VRBase, there is also an option to activate ImGUI in the Editor while not in VR mode. This is useful for performing quick actions without wearing a headset.
+### Controller Transform Calculation
 
-By default, you need to hold the **~** key on your keyboard to activate it, but this can be changed in the `SimpleImGUIActivator` script.
+VR mode needs to calculate controller positions, and for convenience, their positions should always match the player's actual controllers. VR mode provides a parameter that describes how to calculate controller transforms:
+
+1. **CalculateFromInputSystem** - This method calculates position relative to Tracking Space using raw input from the Input System. This method is suitable if your VR rig is built on the standard `XR Origin`. When using this method, you need to assign a Transform to the `Tracking Space` variable. This is typically the root object containing the camera, such as `Camera Offset` or `XR Origin`.
+
+2. **TransformsMirroring** - This method copies the position and rotation from an object that represents the controller's position within the game. This approach is needed for custom VR Rigs and unique locomotion systems, where additional variables beyond Tracking Space need to be calculated. When using this method, you need to assign your Transform for each controller to the `rightControllerMirrorTransform` and `leftControllerMirrorTransform` variables.
 
 ### Building Dear ImGui
 
@@ -399,6 +403,8 @@ No special configuration required.
 **Resolution**: Add `UIMGUI_REMOVE_UNSAFE_DLL` to Project Settings > Player > Other Settings > Scripting Define Symbols > Apply > Restart Unity Editor.
 
 **Issue**: Font atlas crash. There's no fix. Use the callback method for custom fonts instead, or use `CustomFontBootstrap`.
+
+**Issue**: If you frequintly enable and disable UImGui component, you may encounter a random crash related to texture resources not being loaded properly. 
 
 **Android**: If you get an error in an Android build indicating that the cimgui library could not be loaded, make sure to verify the import settings of the libraries located at uimgui-extended\Plugins\imgui\android.
 Each folder corresponding to an ABI must be marked for Android and configured for the correct target architecture.

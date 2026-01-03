@@ -125,15 +125,35 @@ namespace UImGui.VR
             _virtualObject.transform.position = _virtualPosition + _virtualCameraDirection * DistanceToCamera;
         }
 
-        public void GetControllerTransforms(Vector3 deviceCursorPosition, Quaternion deviceCursorRotation, out Vector3 position, out Quaternion rotation)
+        public void GetControllerTransforms(VirtualXRInput virtualXRInput, HandCursorMode handCursorMode, out Vector3 position, out Quaternion rotation)
         {
-            position = _config.trackingSpace.transform.TransformPoint(deviceCursorPosition);
-            rotation = _config.trackingSpace.transform.rotation * deviceCursorRotation;
+            switch (_config.controllerInputMode)
+            {
+                default:
+                case ControllerInputMode.CalculateFromInputSystem:
+                    var deviceCursorPosition = virtualXRInput.CursorPosition.ReadValue<Vector3>();
+                    var deviceCursorRotation = virtualXRInput.CursorRotation.ReadValue<Quaternion>();
+                    position = _config.trackingSpace.transform.TransformPoint(deviceCursorPosition);
+                    rotation = _config.trackingSpace.transform.rotation * deviceCursorRotation;
+                    break;
+                case ControllerInputMode.TransformsMirroring:
+                    if (handCursorMode == HandCursorMode.Left)
+                    {
+                        position = _config.leftControllerMirrorTransform.position;
+                        rotation = _config.leftControllerMirrorTransform.rotation;
+                    }
+                    else
+                    {
+                        position = _config.rightControllerMirrorTransform.position;
+                        rotation = _config.rightControllerMirrorTransform.rotation;
+                    }
+                    break;
+            }
         }
         
-        public Vector2 GetCursorPosition(Vector3 deviceCursorPosition, Quaternion deviceCursorRotation)
+        public Vector2 GetCursorPosition(VirtualXRInput virtualXRInput)
         {
-            GetControllerTransforms(deviceCursorPosition, deviceCursorRotation, out var cursorPosition, out var cursorRotation);
+            GetControllerTransforms(virtualXRInput, virtualXRInput.HandCursorMode, out var cursorPosition, out var cursorRotation);
             
             var cursorDirection = cursorRotation * Vector3.forward;
             

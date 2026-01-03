@@ -28,9 +28,7 @@ namespace UImGui.Platform
         private static void UpdateMouse(ImGuiIOPtr io, VirtualXRInput virtualXRInput,
             WorldSpaceTransformer worldSpaceTransformer)
         {
-            var mouseScreenPosition = worldSpaceTransformer.GetCursorPosition(
-                virtualXRInput.CursorPosition.ReadValue<Vector3>(),
-                virtualXRInput.CursorRotation.ReadValue<Quaternion>());
+            var mouseScreenPosition = worldSpaceTransformer.GetCursorPosition(virtualXRInput);
             io.MousePos = Utils.ScreenToImGui(mouseScreenPosition);
 
             var mouseScroll = virtualXRInput.Scroll.ReadValue<Vector2>();
