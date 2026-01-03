@@ -22,8 +22,8 @@ This is a fork of the UImGui project by [psydack](https://github.com/psydack/uim
 ## Future Development Goals
 
 - Ability to zoom in/out on windows in VR space
-- Better head following and positioning for VR mode
-– Ability to pin text-only informational windows so they remain visible even after exiting VR mode.
+- Better head following and positioning for VR mode 
+- Ability to pin text-only informational windows so they remain visible even after exiting VR mode.
 - More precise control over element sizing
 - Improved GUI activation architecture and UImGUI.cs script workflow
 - Remove static events 
